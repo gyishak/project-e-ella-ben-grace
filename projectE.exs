@@ -71,3 +71,30 @@ defmodule BCoreTest do
             {:varCE, :x}}
   end
 end
+
+ExUnit.start()
+
+defmodule BValTest do
+  use ExUnit.Case
+
+  test "numV" do
+    assert {:numV, 7} ==
+           {:numV, 7}
+  end
+
+  test "boolV" do
+    assert {:boolV, true} ==
+           {:boolV, true}
+  end
+
+  test "closV" do
+    mt_env = %{}
+    body =
+      {:biopCE, :+,
+       {:varCE, :x},
+       {:varCE, :y}}
+
+    assert {:closV, [:x, :y], body, mt_env} ==
+           {:closV, [:x, :y], body, mt_env}
+  end
+end
