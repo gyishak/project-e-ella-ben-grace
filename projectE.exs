@@ -23,6 +23,26 @@ defmodule BValModule do
         {:closV, list(atom()), BCoreModule.t(), EnvModule.env()}
 end
 
+defmodule InterpModule do
+    def interp(expression, env ____) do
+        case expression do
+            {:numCE, n} -> {:numV, n}
+            {:biopCE, op, l, r} -> {}
+            {:boolCE, b} -> {:boolV, b}
+            {:condCE, test, then, else} -> {}
+            {:varCE, name} -> Map.fetch!(env, name)
+            {:letCE, var, val, body} -> 
+                value = interp(val, env)
+                new_env = Map.put(env, var, value)
+                interp(body, new_env)
+            {:lamCE, vars, body} -> {}
+            {:appCE, function, args} -> {}
+        end
+    end
+end
+
+
+
 
 ExUnit.start()
 
