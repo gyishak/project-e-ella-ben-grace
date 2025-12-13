@@ -3,7 +3,7 @@ defmodule EnvModule do
 end
 
 defmodule BCoreModule do
-    @type bcore ::
+    @type bCore ::
         {:numCE, number()} |
         {:biopCE, atom(), t(), t()} |
         {:boolCE, boolean()} |
@@ -13,14 +13,14 @@ defmodule BCoreModule do
         {:lamCE, list(atom()), t()} |
         {:appCE, t(), list(t())}
 
-    @type t :: bcore()
+    @type t :: bCore()
 end
 
 defmodule BValModule do
     @type bVal ::
         {:numV, number()}|
         {:boolV, boolean()}|
-        {:closV, list(atom()), BCoreModule.bCore, EnvModule.env}
+        {:closV, list(atom()), BCoreModule.t(), EnvModule.env()}
 end
 
 
@@ -71,8 +71,6 @@ defmodule BCoreTest do
             {:varCE, :x}}
   end
 end
-
-ExUnit.start()
 
 defmodule BValTest do
   use ExUnit.Case
