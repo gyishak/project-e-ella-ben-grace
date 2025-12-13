@@ -128,7 +128,7 @@ defmodule InterpModule do
     end
 end
 
-defmodule Elixhami.Syntax do
+defmodule ElixhamiSyntax do
     def num(n), do: {:numCE, n}
     def bool(b), do: {:boolCE, b}
     def var(name), do: {:varCE, name}
@@ -148,7 +148,11 @@ defmodule Elixhami.Syntax do
     def app(fun, args), do: {:appCE, fun, args}
 end
 
-
+defmodule Elixhami do
+    def run(expression) do
+        InterpModule.interp(expression, %{})
+    end
+end
 
 
 ExUnit.start()
@@ -416,5 +420,68 @@ defmodule InterpTest do
              {:biopCE, :"||", {:boolCE, false}, {:boolCE, true}},
              @mt_env
            ) == {:boolV, true}
+  end
+end
+
+defmodule ElixhamiSyntaxTest do
+  use ExUnit.Case
+  import ElixhamiSyntax
+  ## literal tests
+  test "number literal" do
+    assert num(42) == {:numCE, 42}
+  end
+  test "true literal" do
+    assert bool(true) == {:boolCE, true}
+  end
+  test "false literal" do
+    assert bool(false) == {:boolCE, false}
+  end
+  test "variable literal" do
+    assert var(:x) == {:varCE, :x}
+  end
+  ## binary operation tests
+  test "addition" do
+    assert add(num(2), num(3)) ==
+             {:biopCE, :+, {:numCE, 2}, {:numCE, 3}}
+  end
+  test "multiplication" do
+    assert mult(num(4), num(5)) ==
+             {:biopCE, :*, {:numCE, 4}, {:numCE, 5}}
+  end
+  test "equality" do
+    assert eq(num(7), num(7)) ==
+             {:biopCE, :"=?", {:numCE, 7}, {:numCE, 7}}
+  end
+  test "greater than" do
+    assert gt(num(10), num(3)) ==
+             {:biopCE, :">?", {:numCE, 10}, {:numCE, 3}}
+  end
+  test "less than" do
+    assert lt(num(2), num(8)) ==
+             {:biopCE, :"<?", {:numCE, 2}, {:numCE, 8}}
+  end
+  test "and" do
+    assert {:biopCE, :"&&", bool(true), bool(false)} ==
+             {:biopCE, :"&&", {:boolCE, true}, {:boolCE, false}}
+  end
+  test "or" do
+    assert {:biopCE, :"||", bool(true), bool(false)} ==
+             {:biopCE, :"||", {:boolCE, true}, {:boolCE, false}}
+  end
+  ## let test
+  test "let expression" do
+    assert let(:x, num(3), var(:x)) ==
+             {:letCE, :x, {:numCE, 3}, {:varCE, :x}}
+  end
+  ## if test
+  test "if expression" do
+    assert if(bool(true), num(1), num(2)) ==
+             {:condCE, {:boolCE, true}, {:numCE, 1}, {:numCE, 2}}
+  end
+  ## lambda test
+  test "lambda expression" do
+    assert lam([:x, :y], add(var(:x), var(:y))) ==
+             {:lamCE, [:x, :y],
+              {:biopCE, :+, {:varCE, :x}, {:varCE, :y}}}
   end
 end
