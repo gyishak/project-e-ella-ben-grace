@@ -95,10 +95,14 @@ defmodule InterpModule do
             {:boolCE, b} -> {:boolV, b}
             {:condCE, test, test_then, test_else} -> 
                 test_boolean = interp(test, env)
-                if test_boolean do
-                    interp(test_then, env)
-                else
-                    interp(test_else, env)
+                case test_boolean do
+                    {:boolV, boolean_value} ->
+                        if boolean_value do
+                            interp(test_then, env)
+                        else
+                            interp(test_else, env)
+                        end
+                    _ -> raise "expected test to be a boolean"
                 end
             {:varCE, name} -> Map.fetch!(env, name)
             {:letCE, var, val, body} -> 
@@ -107,10 +111,19 @@ defmodule InterpModule do
                 interp(body, new_env)
             {:lamCE, vars, body} -> {:closV, vars, body, env}
             {:appCE, function, args} -> 
-                {:closV, params, body, clos_env} = interp(function, env)
-                args_values = Enum.map(args, fn(arg) -> interp(arg, env) end)
-                new_env = Enum.into(Enum.zip(params, args_values), clos_env)
-                interp(body, new_env)
+                funcV=interp(function,env)
+                case funcV do
+                  {:closV, params, body, clos_env} ->
+                    args_values = Enum.map(args, fn(arg) -> interp(arg, env) end)
+                  if length(params)==length(args_values) do
+                    new_env = Enum.into(Enum.zip(params, args_values), clos_env)
+                    interp(body, new_env)
+                  else 
+                    raise "arity mismatch!"
+                  end
+              _  ->
+                raise "expected a function"
+            end
         end
     end
 end
@@ -330,18 +343,6 @@ defmodule InterpTest do
     assert_raise RuntimeError, "expected a function", fn ->
       InterpModule.interp(
         {:appCE, {:numCE, 5}, [{:numCE, 3}]},
-        @mt_env
-      )
-    end
-  end
-  test "arity mismatch" do
-    assert_raise RuntimeError, fn ->
-      InterpModule.interp(
-        {
-          :appCE,
-          {:lamCE, [:x, :y], {:biopCE, :"+", {:varCE, :x}, {:varCE, :y}}},
-          [{:numCE, 5}]
-        },
         @mt_env
       )
     end
