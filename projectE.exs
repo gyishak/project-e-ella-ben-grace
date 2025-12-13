@@ -1,20 +1,33 @@
-defmodule BCoreModule do
-    @type BCore ::
-        {:numCE, number()} |
-        {:biopCE, atom(), BCore(), BCore()} |
-        {:boolCE, boolean()} |
-        {:condCE, BCore(), BCore(), BCore()} |
-        {:varCE, atom()} |
-        {:letCE, atom(), BCore(), BCore()} |
-        {:lamCE, list(atom()), BCore()} |
-        {:appCE, BCore(), list(BCore())}
+defmodule EnvModule do
+    @type env :: %{atom() => BValModule.bVal}
 end
+
+defmodule BCoreModule do
+    @type bcore ::
+        {:numCE, number()} |
+        {:biopCE, atom(), t(), t()} |
+        {:boolCE, boolean()} |
+        {:condCE, t(), t(), t()} |
+        {:varCE, atom()} |
+        {:letCE, atom(), t(), t()} |
+        {:lamCE, list(atom()), t()} |
+        {:appCE, t(), list(t())}
+
+    @type t :: bcore()
+end
+
+defmodule BValModule do
+    @type bVal ::
+        {:numV, number()}|
+        {:boolV, boolean()}|
+        {:closV, list(atom()), BCoreModule.bCore, EnvModule.env}
+end
+
 
 ExUnit.start()
 
 defmodule BCoreTest do
   use ExUnit.Case
-  alias BCoreModule, as: B
 
   test "numCE" do
     assert {:numCE, 5} ==
