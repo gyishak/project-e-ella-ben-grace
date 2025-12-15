@@ -5,7 +5,7 @@ Elixir 1.19.4<br><br>
 
 Build/Run Steps:<br>
 1. Install elixir with command: brew install elixir <br>
-2. Run our program command: elixir projectE.exs<br><br>
+2. Run our program with command: elixir projectE.exs<br><br>
    
 Limitations:<br>
 We completed everything in Project B except desugar and a section of parser. We also do not have full converage. 
